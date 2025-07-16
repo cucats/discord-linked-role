@@ -6,7 +6,7 @@ Authenticates @cam.ac.uk accounts via UCD OIDC.
 import requests
 import secrets
 from urllib.parse import urlencode
-import config
+from src import config
 
 
 TENANT_ID = "49a50445-bdfa-4b79-ade3-547b4f3986e9"

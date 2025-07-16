@@ -3,8 +3,8 @@ Register Discord linked role metadata schema.
 This should be run once to register the metadata fields with Discord.
 """
 
-import config
 import requests
+from src import config
 
 
 def register_metadata():

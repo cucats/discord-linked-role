@@ -1,9 +1,6 @@
 from flask import Flask, request, redirect, session, render_template_string
 from datetime import datetime
-import config
-import discord_oauth
-import oidc
-import database
+from src import config, discord_oauth, oidc, database
 
 app = Flask(__name__)
 app.secret_key = config.FLASK_SECRET_KEY

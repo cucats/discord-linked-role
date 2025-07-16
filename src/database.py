@@ -6,7 +6,7 @@ import mysql.connector
 from mysql.connector import Error
 import json
 from typing import Optional, Dict, Any
-import config
+from src import config
 
 
 def get_connection():

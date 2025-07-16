@@ -2,8 +2,7 @@ import requests
 import secrets
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
-import config
-import database
+from src import config, database
 
 
 def get_oauth_url():
