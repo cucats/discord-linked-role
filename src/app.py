@@ -223,10 +223,3 @@ async def update_metadata(user_id: str, verification: dict):
         }
 
     await discord_oauth.push_metadata(user_id, tokens, metadata)
-
-
-if __name__ == "__main__":
-    # Initialize database tables
-    database.init_database()
-
-    app.run(host="0.0.0.0", port=config.FLASK_PORT)
