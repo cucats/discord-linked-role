@@ -8,7 +8,6 @@ services:
             - .env
         environment:
             - PYTHONUNBUFFERED=1
-            - MYSQL_HOST=mysql
         depends_on:
             - database
 
@@ -22,3 +21,4 @@ services:
 
 volumes:
     mysql_data:
+s
