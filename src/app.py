@@ -3,6 +3,7 @@ from datetime import datetime
 from src import config, discord_oauth, oidc, database
 
 app = Flask(__name__)
+app.secret_key = config.FLASK_SECRET
 
 
 SUCCESS_TEMPLATE = """
