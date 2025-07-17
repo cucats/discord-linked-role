@@ -21,17 +21,12 @@ Verifies University of Cambridge members via Open ID Connect (OIDC) with the Uni
 -   `/discord-oauth-callback` - Discord callback
 -   `/ucd-oidc-callback` - UCD callback
 
-## Deployment with Gunicorn
+## Deployment
 
 1. Install dependencies: `uv pip install .`
 2. Configure `.env` with production values
 3. Run with Gunicorn:
 
 ```bash
-exec gunicorn wsgi:app \
-    --bind "unix:/path/to/socket.unix" \
-    --workers 2 \
-    --timeout 120 \
-    --access-logfile - \
-    --error-logfile - \
+uv run gunicorn wsgi:app --bind "0.0.0.0:8000" --workers 2
 ```
