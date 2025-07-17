@@ -158,3 +158,6 @@ async def get_verification(user_id: str) -> Optional[Dict[str, Any]]:
     except Error as e:
         print(f"Error getting verification: {e}")
         return None
+
+if __name__ == "__main__":
+    init_database()
