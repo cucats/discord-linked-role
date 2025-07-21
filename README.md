@@ -1,17 +1,16 @@
 # Discord Cambridge Linked Role
 
-Verifies University of Cambridge members via Open ID Connect (OIDC) with the University Central Directory (UDC) for Discord applications.
+Verifies University of Cambridge members via Microsoft Entra ID with the University Central Directory for Discord applications.
 
 ## Setup
 
-1. Follow https://discord.com/developers/applications
+1. See https://discord.com/developers/applications
 2. Setup https://toolkit.uis.cam.ac.uk
 3. Copy `.env.example` to `.env` and fill in credentials
 4. Install: `uv pip install .`
-5. Initialise database: `uv run python -m src.database`
-6. Register metadata with Discord: `uv run python -m src.register_metadata`
-7. Run development: `uv run python -m src.app`
-8. Run production: `uv run gunicorn wsgi:app -b "0.0.0.0:8000" -w 2`
+5. Register metadata with Discord: `uv run python -m src.register_metadata`
+6. Run development: `uv run python -m src.app`
+7. Run production: `uv run gunicorn wsgi:app -b "0.0.0.0:5000" -w 2`
 
 ## Metadata
 
@@ -20,5 +19,5 @@ Verifies University of Cambridge members via Open ID Connect (OIDC) with the Uni
 ## Endpoints
 
 -   `/linked-role` - Start verification
--   `/discord-oauth-callback` - Discord callback
--   `/ucd-oidc-callback` - UCD callback
+-   `/discord/callback` - Discord callback
+-   `/ucam/callback` - Cambridge callback

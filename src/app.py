@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect, session, render_template_string
 from datetime import datetime
-from src import config, discord_oauth, oidc, database
+from src import config, discord, ucam
 
 app = Flask(__name__)
 app.secret_key = config.FLASK_SECRET
@@ -75,46 +75,29 @@ ERROR_TEMPLATE = """
 """
 
 
-@app.route("/")
-def index():
-    return "Running"
-
-
 @app.route("/linked-role")
 async def linked_role():
-    oauth_data = discord_oauth.get_oauth_url()
-    session["discord_state"] = oauth_data["state"]
-    return redirect(oauth_data["url"])
+    authorization_url, state = discord.get_oauth_url()
+    session["discord_state"] = state
+    return redirect(authorization_url)
 
 
-@app.route("/discord-oauth-callback")
-async def discord_oauth_callback():
-    """Discord OAuth callback"""
+@app.route("/discord/callback")
+async def discord_callback():
     try:
-        # Verify state
-        state = request.args.get("state")
-        if state != session.get("discord_state"):
-            return "State verification failed", 403
-
-        # Get tokens
+        assert request.args.get("state") == session.get("discord_state")
         code = request.args.get("code")
-        tokens = discord_oauth.get_oauth_tokens(code)
-
-        # Get user data
-        user_data = discord_oauth.get_user_data(tokens)
+        tokens = discord.get_token(code)
+        user_data = discord.get_user_data(tokens)
         user_id = user_data["user"]["id"]
-
-        # Store tokens
         tokens["expires_at"] = datetime.now().timestamp() + tokens["expires_in"]
-        await database.store_discord_tokens(user_id, tokens)
-
-        # Always redirect to UCD OIDC for fresh verification
-        oidc_data = oidc.get_oidc_auth_url(user_id)
-        session["oidc_state"] = oidc_data["state"]
-        return redirect(oidc_data["url"])
+        session[f"discord_tokens_{user_id}"] = tokens
+        authorization_url, state = ucam.get_auth_url(user_id)
+        session["ucam_state"] = state
+        return redirect(authorization_url)
 
     except Exception as e:
-        print(f"Discord OAuth Error: {e}")
+        print(e)
         return (
             render_template_string(
                 ERROR_TEMPLATE,
@@ -125,65 +108,28 @@ async def discord_oauth_callback():
         )
 
 
-@app.route("/ucd-oidc-callback")
-async def ucd_oidc_callback():
-    """UCD OIDC callback"""
+@app.route("/ucam/callback")
+async def ucd_ucam_callback():
     try:
-        # Verify state and extract Discord user ID
-        state = request.args.get("state")
-        stored_state = session.get("oidc_state")
-
-        if (
-            not state
-            or not stored_state
-            or not state.startswith(stored_state.split(":")[0])
-        ):
-            return (
-                render_template_string(
-                    ERROR_TEMPLATE, message="Invalid state parameter.", retry_url=None
-                ),
-                403,
-            )
-
+        assert request.args.get("state") == session.get("ucam_state")
         discord_user_id = state.split(":")[0]
-
-        # Get OIDC tokens
         code = request.args.get("code")
-        tokens = oidc.get_oidc_tokens(code)
+        tokens = ucam.get_token(code)
+        user_info = ucam.get_user_info(tokens["access_token"])
+        is_student = ucam.is_student(user_info)
+        upn = user_info.get("userPrincipalName", "")
+        verification = {"verified": True, "upn": upn, "is_student": is_student}
 
-        # Get user info
-        user_info = oidc.get_user_info(tokens["access_token"])
-
-        # Verify Cambridge user
-        verification = oidc.verify_cambridge_user(user_info)
-
-        if not verification["verified"]:
-            return (
-                render_template_string(
-                    ERROR_TEMPLATE,
-                    message="You must sign in with a valid @cam.ac.uk account.",
-                    retry_url=f"/retry?user_id={discord_user_id}",
-                ),
-                400,
-            )
-
-        # Store verification with UPN
-        await database.store_verification(
-            discord_user_id, verification["upn"], verification["is_student"]
-        )
-
-        # Update Discord metadata
         await update_metadata(discord_user_id, verification)
 
-        # Show verification info in success page
         return render_template_string(
             SUCCESS_TEMPLATE,
-            crsid=verification["upn"],
-            is_student=verification.get("is_student", False),
+            crsid=upn,
+            is_student=is_student,
         )
 
     except Exception as e:
-        print(f"UCD OIDC error: {e}")
+        print(e)
         return (
             render_template_string(
                 ERROR_TEMPLATE,
@@ -196,24 +142,21 @@ async def ucd_oidc_callback():
 
 @app.route("/retry")
 async def retry_verification():
-    """Retry verification for a user."""
     user_id = request.args.get("user_id")
     if not user_id:
         return redirect("/")
 
-    # Redirect straight to UCD OIDC
-    oidc_data = oidc.get_oidc_auth_url(user_id)
-    session["oidc_state"] = oidc_data["state"]
-    return redirect(oidc_data["url"])
+    authorization_url, state = ucam.get_auth_url(user_id)
+    session["ucam_state"] = state
+    return redirect(authorization_url)
 
 
 async def update_metadata(user_id: str, verification: dict):
-    """Update Discord metadata for a user."""
-    tokens = await database.get_discord_tokens(user_id)
+    tokens = session.get(f"discord_tokens_{user_id}")
     if not tokens:
         return
 
-    if verification and verification.get("verified"):
+    if verification.get("verified"):
         metadata = {
             "is_student": "1" if verification.get("is_student", False) else "0",
         }
@@ -222,4 +165,4 @@ async def update_metadata(user_id: str, verification: dict):
             "is_student": "0",
         }
 
-    await discord_oauth.push_metadata(user_id, tokens, metadata)
+    await discord.push_metadata(tokens, metadata)
