@@ -111,7 +111,8 @@ async def discord_callback():
 @app.route("/ucam/callback")
 async def ucd_ucam_callback():
     try:
-        assert request.args.get("state") == session.get("ucam_state")
+        state = request.args.get("state")
+        assert state == session.get("ucam_state")
         discord_user_id = state.split(":")[0]
         code = request.args.get("code")
         tokens = ucam.get_token(code)

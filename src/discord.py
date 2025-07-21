@@ -14,11 +14,7 @@ def get_oauth_url():
         scope=["identify", "role_connections.write"],
     )
 
-    authorization_url, state = oauth.authorization_url(
-        DISCORD_AUTHORIZATION_BASE_URL, prompt="consent"
-    )
-
-    return authorization_url, state
+    return oauth.authorization_url(DISCORD_AUTHORIZATION_BASE_URL, prompt="consent")
 
 
 def get_token(code: str) -> dict:
