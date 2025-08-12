@@ -1,0 +1,54 @@
+{% extends "base.j2" %}
+
+{% block title %}Verification Successful{% endblock %}
+
+{% block extra_styles %}
+<style>
+  h1 {
+    color: #87cbeb;
+  }
+
+  .details {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+
+  .detail-row {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .label {
+    font-weight: bold;
+    color: #8b949e;
+  }
+
+  .value {
+    color: #5fa3bc;
+  }
+
+  .info {
+    color: #8b949e;
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Verification Successful!</h1>
+<div class="details">
+  <div class="detail-row">
+    <span class="label">Account:</span>
+    <span class="value">{{ crsid }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="label">Status:</span>
+    <span class="value">{{ "Current Student" if is_student else "Cambridge Member" }}</span>
+  </div>
+</div>
+<p class="info">You can now close this window.</p>
+{% endblock %}

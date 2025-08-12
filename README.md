@@ -2,22 +2,51 @@
 
 Verifies University of Cambridge members via Microsoft Entra ID with the University Central Directory for Discord applications.
 
+## Prerequisites
+
+Obtain a Client ID, Client Secret, and Bot token from https://discord.com/developers/applications
+Obtain a Client ID and Client Secret from https://toolkit.uis.cam.ac.uk/endpoints
+
 ## Setup
 
-1. See https://discord.com/developers/applications
-2. Setup https://toolkit.uis.cam.ac.uk
-3. Copy `.env.example` to `.env` and fill in credentials
-4. Install: `uv pip install .`
-5. Register metadata with Discord: `uv run python -m src.register_metadata`
-6. Run development: `uv run python -m src.app`
-7. Run production: `uv run gunicorn wsgi:app -b "0.0.0.0:5000" -w 2`
+Fill out `.env`:
+
+```sh
+cp .env.example .env
+```
+
+Install dependencies:
+
+```sh
+uv sync
+```
+
+Register metadata with Discord:
+
+```sh
+uv run python -m src.discord`
+```
+
+Run a development server:
+
+```sh
+uv run python -m src.app
+```
+
+Run a production server:
+
+```sh
+uv run gunicorn wsgi:app -b "0.0.0.0:5000" -w 2
+```
 
 ## Metadata
 
--   `is_student`: Current student (boolean)
+- `is_student`: Current student (boolean)
 
 ## Endpoints
 
--   `/linked-role` - Start verification
--   `/discord/callback` - Discord callback
--   `/ucam/callback` - Cambridge callback
+- `/linked-role` - Start verification
+- `/discord/callback` - Discord callback
+- `/ucam/callback` - Cambridge callback
+- `/preview/success` - Preview of success page
+- `/preview/error` - Preview of error page

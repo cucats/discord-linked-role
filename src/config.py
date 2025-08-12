@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,8 +21,8 @@ DISCORD_CLIENT_ID = getenv("DISCORD_CLIENT_ID")
 DISCORD_CLIENT_SECRET = getenv("DISCORD_CLIENT_SECRET")
 DISCORD_REDIRECT_URI = f"{HOST}/discord/callback"
 
-OIDC_CLIENT_ID = getenv("UCAM_CLIENT_ID")
-OIDC_CLIENT_SECRET = getenv("UCAM_CLIENT_SECRET")
-OIDC_REDIRECT_URI = f"{HOST}/ucam/callback"
+UCAM_CLIENT_ID = getenv("UCAM_CLIENT_ID")
+UCAM_CLIENT_SECRET = getenv("UCAM_CLIENT_SECRET")
+UCAM_REDIRECT_URI = f"{HOST}/ucam/callback"
 
 FLASK_SECRET = getenv("FLASK_SECRET")

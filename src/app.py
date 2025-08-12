@@ -1,20 +1,17 @@
-from flask import Flask, request, redirect, session, render_template
-from datetime import datetime
-from src import config, discord, ucam
 import secrets
 
+from flask import Flask, request, redirect, session, render_template
+
+from src import discord, ucam
+from .config import FLASK_SECRET
+
 app = Flask(__name__)
-app.secret_key = config.FLASK_SECRET
-
-
-@app.route("/")
-def root():
-    return "Running"
+app.secret_key = FLASK_SECRET
 
 
 @app.route("/linked-role")
 async def linked_role():
-    authorization_url, state = discord.get_oauth_url()
+    authorization_url, state = discord.get_authorization_url()
     session["discord_state"] = state
     return redirect(authorization_url)
 
@@ -22,10 +19,10 @@ async def linked_role():
 @app.route("/discord/callback")
 async def discord_callback():
     try:
-        assert request.args.get("state") == session.get("discord_state")
+        assert request.args.get("state") == session.get("discord_state"), ""
         code = request.args.get("code")
 
-        tokens = session[f"discord_tokens"] = discord.get_token(code)
+        tokens = session[f"discord_tokens"] = discord.get_tokens(code)
 
         state = session["ucam_state"] = secrets.token_urlsafe(32)
         authorization_url = ucam.get_authorization_url(state)
@@ -35,34 +32,40 @@ async def discord_callback():
         print(e)
         return (
             render_template(
-                "error.html",
+                "error.j2",
                 message="An error occurred during Discord authentication.",
-                retry_url=None,
             ),
             500,
         )
 
 
 @app.route("/ucam/callback")
-async def ucd_ucam_callback():
+async def ucam_callback():
     try:
         assert request.args.get("state") == session.get("ucam_state")
         code = request.args.get("code")
+        ucam_tokens = ucam.get_tokens(code)
 
-        tokens = ucam.get_token(code)
-        credentials = ucam.Token(tokens["access_token"])
+        discord_tokens = session.get(f"discord_tokens")
+        if not discord_tokens:
+            return
+
+        credentials = ucam.Token(ucam_tokens["access_token"])
         client = ucam.GraphClient(credentials)
 
-        upn = await client.upn()
-        if upn is None:
-            raise ValueError("No upn")
-        is_student = await client.is_student()
-        verification = {"upn": upn, "is_student": is_student}
+        upn = await client.user_principal_name()
+        assert upn is not None
 
-        await update_metadata(verification)
+        is_student = await client.is_student()
+
+        metadata = {
+            "is_student": "1" if is_student else "0",
+        }
+
+        discord.push_metadata(discord_tokens, metadata)
 
         return render_template(
-            "success.html",
+            "success.j2",
             crsid=upn,
             is_student=is_student,
         )
@@ -71,22 +74,25 @@ async def ucd_ucam_callback():
         print(e)
         return (
             render_template(
-                "error.html",
+                "error.j2",
                 message="An error occurred during authentication.",
-                retry_url=None,
             ),
             500,
         )
 
 
-def update_metadata(verification: dict):
-    tokens = session.get(f"discord_tokens")
+@app.route("/preview/success")
+def preview_success():
+    return render_template(
+        "success.j2",
+        crsid="Preview",
+        is_student=True,
+    )
 
-    if not tokens:
-        return
 
-    metadata = {
-        "is_student": "1" if verification.get("is_student", False) else "0",
-    }
-
-    discord.push_metadata(tokens, metadata)
+@app.route("/preview/error")
+def preview_error():
+    return render_template(
+        "error.j2",
+        message="Preview",
+    )

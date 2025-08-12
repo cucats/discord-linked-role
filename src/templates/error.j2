@@ -1,0 +1,31 @@
+{% extends "base.j2" %}
+
+{% block title %}Verification Failed{% endblock %}
+
+{% block extra_styles %}
+<style>
+  h1 {
+    color: #f85149;
+  }
+
+  p {
+    color: #c9d1d9;
+  }
+
+  .button {
+    background: #5865f2;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Verification Failed</h1>
+<p>{{ message }}</p>
+{% endblock %}
