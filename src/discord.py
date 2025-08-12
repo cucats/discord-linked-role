@@ -3,18 +3,19 @@ from requests_oauthlib import OAuth2Session
 from src import config
 
 
-DISCORD_AUTHORIZATION_BASE_URL = "https://discord.com/api/oauth2/authorize"
 DISCORD_TOKEN_URL = f"{config.DISCORD_API_ENDPOINT}/oauth2/token"
 
 
 def get_oauth_url():
     oauth = OAuth2Session(
-        config.DISCORD_CLIENT_ID,
+        client_id=config.DISCORD_CLIENT_ID,
         redirect_uri=config.DISCORD_REDIRECT_URI,
         scope=["identify", "role_connections.write"],
     )
 
-    return oauth.authorization_url(DISCORD_AUTHORIZATION_BASE_URL, prompt="consent")
+    return oauth.authorization_url(
+        "https://discord.com/api/oauth2/authorize", prompt="consent"
+    )
 
 
 def get_token(code: str) -> dict:
@@ -54,15 +55,6 @@ def get_access_token(tokens: dict) -> dict:
         return new_tokens
 
     return tokens
-
-
-def get_user_data(tokens: dict) -> dict:
-    oauth = OAuth2Session(config.DISCORD_CLIENT_ID, token=tokens)
-
-    response = oauth.get(f"{config.DISCORD_API_ENDPOINT}/oauth2/@me")
-    response.raise_for_status()
-
-    return response.json()
 
 
 async def push_metadata(tokens: dict, metadata: dict):

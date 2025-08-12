@@ -1,5 +1,5 @@
 import requests
-from src import config
+import config
 
 
 def register_metadata():
