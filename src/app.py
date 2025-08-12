@@ -79,7 +79,7 @@ async def ucd_ucam_callback():
         )
 
 
-async def update_metadata(verification: dict):
+def update_metadata(verification: dict):
     tokens = session.get(f"discord_tokens")
 
     if not tokens:
@@ -89,4 +89,4 @@ async def update_metadata(verification: dict):
         "is_student": "1" if verification.get("is_student", False) else "0",
     }
 
-    await discord.push_metadata(tokens, metadata)
+    discord.push_metadata(tokens, metadata)
