@@ -22,7 +22,7 @@ async def discord_callback():
         assert request.args.get("state") == session.get("discord_state"), ""
         code = request.args.get("code")
 
-        tokens = session[f"discord_tokens"] = discord.get_tokens(code)
+        session["discord_tokens"] = discord.get_tokens(code)
 
         state = session["ucam_state"] = secrets.token_urlsafe(32)
         authorization_url = ucam.get_authorization_url(state)
@@ -46,7 +46,7 @@ async def ucam_callback():
         code = request.args.get("code")
         ucam_tokens = ucam.get_tokens(code)
 
-        discord_tokens = session.get(f"discord_tokens")
+        discord_tokens = session["discord_tokens"]
         if not discord_tokens:
             return
 
