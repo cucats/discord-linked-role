@@ -11,3 +11,6 @@ dependencies = [
     "flask[async]>=3.1.1",
     "gunicorn>=23.0.0",
 ]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.12.8"]
