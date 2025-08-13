@@ -9,10 +9,18 @@ Obtain a Client ID and Client Secret from https://toolkit.uis.cam.ac.uk/endpoint
 
 ## Setup
 
-Fill out `.env`:
+```conf
+Environment:
+HOST=http://localhost:5000
 
-```sh
-cp .env.example .env
+DISCORD_BOT_TOKEN=
+DISCORD_CLIENT_ID=
+DISCORD_CLIENT_SECRET=
+
+UCAM_CLIENT_ID=
+UCAM_CLIENT_SECRET=
+
+FLASK_SECRET=
 ```
 
 Install dependencies:

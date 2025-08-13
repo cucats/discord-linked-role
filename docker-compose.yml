@@ -4,7 +4,12 @@ services:
     restart: unless-stopped
     ports:
       - "5000:5000"
-    env_file:
-      - .env
     environment:
       - PYTHONUNBUFFERED=1
+      - HOST
+      - DISCORD_BOT_TOKEN
+      - DISCORD_CLIENT_ID
+      - DISCORD_CLIENT_SECRET
+      - UCAM_CLIENT_ID
+      - UCAM_CLIENT_SECRET
+      - FLASK_SECRET
