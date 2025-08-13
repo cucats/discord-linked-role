@@ -1,6 +1,16 @@
-# Discord Cambridge Linked Role
+<div align="center">
 
-Verifies University of Cambridge members via Microsoft Entra ID with the University Central Directory for Discord applications.
+# Discord Linked Role for the University of Cambridge
+
+[![CI](https://github.com/cucats/discord-linked-role/actions/workflows/ci.yml/badge.svg)](https://github.com/cucats/discord-linked-role/actions/workflows/ci.yml)
+[![CD](https://github.com/cucats/discord-linked-role/actions/workflows/cd.yml/badge.svg)](https://github.com/cucats/discord-linked-role/actions/workflows/cd.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/downloads/)
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&logoColor=white)](https://ghcr.io/cucats/discord-linked-role)
+
+Verifies University of Cambridge students via Microsoft Entra ID for a Discord linked role.
+
+</div>
 
 ## Prerequisites
 
@@ -9,17 +19,15 @@ Obtain a Client ID and Client Secret from https://toolkit.uis.cam.ac.uk/endpoint
 
 ## Setup
 
-```conf
-Environment:
-HOST=http://localhost:5000
+Make sure these environment variables are set.
 
+```conf
+HOST=
 DISCORD_BOT_TOKEN=
 DISCORD_CLIENT_ID=
 DISCORD_CLIENT_SECRET=
-
 UCAM_CLIENT_ID=
 UCAM_CLIENT_SECRET=
-
 FLASK_SECRET=
 ```
 
