@@ -3,10 +3,15 @@ import secrets
 from flask import Flask, request, redirect, session, render_template
 
 from src import discord, ucam
-from .config import FLASK_SECRET
+from .config import DISCORD_INVITE_URL, FLASK_SECRET
 
 app = Flask(__name__)
 app.secret_key = FLASK_SECRET
+
+
+@app.route("/")
+def index():
+    return redirect(DISCORD_INVITE_URL)
 
 
 @app.route("/linked-role")

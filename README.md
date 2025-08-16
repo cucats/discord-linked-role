@@ -23,6 +23,7 @@ Make sure these environment variables are set.
 
 ```conf
 HOST=
+DISCORD_INVITE=
 DISCORD_BOT_TOKEN=
 DISCORD_CLIENT_ID=
 DISCORD_CLIENT_SECRET=
